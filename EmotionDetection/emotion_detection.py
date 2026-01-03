@@ -15,17 +15,23 @@ def emotion_detector(text_to_analyze):
     response = requests.post(URL, json = myobj, headers = Headers)
     # load formatted response
     formatted_response = json.loads(response.text)
-    # extract the emotions dict from the response
-    emotions_dict = formatted_response["emotionPredictions"][0]["emotion"]
-    # find the dominant_emotion
-    score = -1
-    dominant_emotion = ''
-    for emtn in emotions_dict:
-        if emotions_dict[emtn]>score:
-            score = emotions_dict[emtn]
-            dominant_emotion = emtn
-    # create the entry for dominant_emotion
-    emotions_dict["dominant_emotion"] = dominant_emotion
+
+    # when status code is 200
+    if response.status_code == 200:
+        # extract the emotions dict from the response
+        emotions_dict = formatted_response["emotionPredictions"][0]["emotion"]
+        # find the dominant_emotion
+        score = -1
+        dominant_emotion = ''
+        for emtn in emotions_dict:
+            if emotions_dict[emtn]>score:
+                score = emotions_dict[emtn]
+                dominant_emotion = emtn
+        # create the entry for dominant_emotion
+        emotions_dict["dominant_emotion"] = dominant_emotion
+    # when status code is 400 
+    elif response.status_code == 400:
+        emotions_dict = {"anger": None, "disgust": None, "fear": None, "joy": None, "sadness": None, "dominant_emotion": None}
 
     # return the updated dict
     return emotions_dict 
